@@ -27,8 +27,8 @@ static GGAudioSession *session = nil;
         session.audioSession = [AVAudioSession sharedInstance];
         [session.audioSession setActive:YES error:nil];
         [session.audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
+        session.isActived = YES;
         [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-        
         [[NSNotificationCenter defaultCenter] addObserver:session selector:@selector(receiveHeadPhoneOut:) name:AVAudioSessionRouteChangeNotification object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:session selector:@selector(receiveInterrupt:) name:AVAudioSessionInterruptionNotification object:nil];
@@ -76,6 +76,35 @@ static GGAudioSession *session = nil;
         }
     }
     
+}
+
+- (void)activeAudioSession {
+    if (_isActived == NO) {
+        [self.audioSession setActive:YES error:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveHeadPhoneOut:) name:AVAudioSessionRouteChangeNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveInterrupt:) name:AVAudioSessionInterruptionNotification object:nil];
+        _isActived = YES;
+    }
+}
+
+- (void)inactiveAudioSession {
+    if (_isActived == YES) {
+        [self.audioSession setActive:NO error:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        _isActived = NO;
+    }
+}
+
+- (void)dealloc {
+    [self inactiveAudioSession];
+    self.beforeInterrupt = nil;
+    self.afterInterrupt = nil;
+    self.headPhoneOut = nil;
+}
+
+- (void)setIsActived:(BOOL)isActived {
+    _isActived = isActived;
 }
 
 @end

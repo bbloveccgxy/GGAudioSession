@@ -26,4 +26,10 @@ typedef void(^GGAudioSessionInterrupt)();
 
 @property (copy, nonatomic) GGAudioSessionInterrupt beforeInterrupt;
 
+@property (assign, readonly, nonatomic) BOOL isActived;
+
+- (void)inactiveAudioSession;
+
+- (void)activeAudioSession;
+
 @end
